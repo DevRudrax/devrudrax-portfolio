@@ -1,0 +1,6 @@
+---
+pid: 17788
+cwd: |
+  C:\Users\user
+---
+PS C:\Users\user>
