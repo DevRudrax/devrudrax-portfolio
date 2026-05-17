@@ -499,7 +499,7 @@ body.is-mobile button {
   overflow: hidden;
 }
 
-.hero__title .line--accent {
+.hero__title .line--accent .char {
   background: linear-gradient(90deg, var(--cyan) 0%, var(--violet) 100%);
   -webkit-background-clip: text;
   background-clip: text;
