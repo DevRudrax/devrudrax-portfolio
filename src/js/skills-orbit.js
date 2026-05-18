@@ -19,6 +19,10 @@ export class SkillsOrbit {
     this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+    // Create a central group that we can rotate with drag/touch interaction
+    this.orbitGroup = new THREE.Group();
+    this.scene.add(this.orbitGroup);
+
     const coreGeo = new THREE.SphereGeometry(0.55, 32, 32);
     const coreMat = new THREE.MeshBasicMaterial({
       color: 0x8b5cf6,
@@ -26,7 +30,7 @@ export class SkillsOrbit {
       opacity: 0.9,
     });
     this.core = new THREE.Mesh(coreGeo, coreMat);
-    this.scene.add(this.core);
+    this.orbitGroup.add(this.core);
 
     const glowGeo = new THREE.SphereGeometry(0.78, 32, 32);
     const glowMat = new THREE.MeshBasicMaterial({
@@ -36,7 +40,7 @@ export class SkillsOrbit {
       wireframe: true,
     });
     this.glow = new THREE.Mesh(glowGeo, glowMat);
-    this.scene.add(this.glow);
+    this.orbitGroup.add(this.glow);
 
     this.nodes = [];
     const orbitRadius = 3.2;
@@ -64,14 +68,68 @@ export class SkillsOrbit {
         speed: 0.28 + (i % 5) * 0.05,
       };
 
-      this.scene.add(group);
+      this.orbitGroup.add(group);
       this.nodes.push(group);
     });
 
     this._buildConnections();
     this.clock = new THREE.Clock();
+
+    // Interaction state variables
+    this.targetRotationY = 0;
+    this.targetRotationX = 0;
+    this.currentRotationY = 0;
+    this.currentRotationX = 0;
+
+    let isPointerDown = false;
+    let previousPointerX = 0;
+    let previousPointerY = 0;
+
+    // Responsive interaction handlers
+    this._onPointerDown = (e) => {
+      isPointerDown = true;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      previousPointerX = clientX;
+      previousPointerY = clientY;
+    };
+
+    this._onPointerMove = (e) => {
+      if (!isPointerDown) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      
+      const deltaX = clientX - previousPointerX;
+      const deltaY = clientY - previousPointerY;
+      
+      this.targetRotationY += deltaX * 0.006;
+      this.targetRotationX += deltaY * 0.006;
+      
+      // Limit vertical rotation to avoid flipping upside down
+      this.targetRotationX = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, this.targetRotationX));
+
+      previousPointerX = clientX;
+      previousPointerY = clientY;
+    };
+
+    this._onPointerUp = () => {
+      isPointerDown = false;
+    };
+
+    // Attach listeners for drag control
+    const dragTarget = this.canvas.parentElement;
+    if (dragTarget) {
+      dragTarget.addEventListener('mousedown', this._onPointerDown);
+      dragTarget.addEventListener('mousemove', this._onPointerMove);
+      dragTarget.addEventListener('touchstart', this._onPointerDown, { passive: true });
+      dragTarget.addEventListener('touchmove', this._onPointerMove, { passive: true });
+    }
+    window.addEventListener('mouseup', this._onPointerUp);
+    window.addEventListener('touchend', this._onPointerUp);
+
     this._resize();
-    window.addEventListener('resize', () => this._resize());
+    this._resizeHandler = () => this._resize();
+    window.addEventListener('resize', this._resizeHandler);
   }
 
   setActive(active) {
@@ -108,15 +166,26 @@ export class SkillsOrbit {
       opacity: 0.18,
     });
     this.connectionLines = new THREE.LineSegments(geo, mat);
-    this.scene.add(this.connectionLines);
+    this.orbitGroup.add(this.connectionLines);
     this.linePositions = positions;
   }
 
   _resize() {
     const parent = this.canvas.parentElement;
+    if (!parent) return;
     const w = parent.clientWidth;
     const h = parent.clientHeight;
     this.camera.aspect = w / h;
+
+    // Dynamically adjust camera Z distance on mobile/tablet to avoid screen clipping
+    if (w < 480) {
+      this.camera.position.z = 10.5;
+    } else if (w < 768) {
+      this.camera.position.z = 9.0;
+    } else {
+      this.camera.position.z = 8.0;
+    }
+
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
   }
@@ -127,26 +196,62 @@ export class SkillsOrbit {
     this.glow.rotation.x = t * 0.15;
     this.glow.rotation.z = t * 0.1;
 
+    // Smoothly interpolate rotation from mouse/touch drags
+    this.currentRotationY += (this.targetRotationY - this.currentRotationY) * 0.05;
+    this.currentRotationX += (this.targetRotationX - this.currentRotationX) * 0.05;
+
+    // Apply rotation to the orbit group, overlaying a slow auto-drift
+    this.orbitGroup.rotation.y = this.currentRotationY + t * 0.08;
+    this.orbitGroup.rotation.x = this.currentRotationX;
+
     const linePos = this.linePositions;
     let offset = 0;
     this.nodePositions = [];
 
+    // Responsive scaling variables based on screen width
+    const w = window.innerWidth;
+    const scaleFactor = w < 480 ? 0.60 : (w < 768 ? 0.80 : 1.0);
+    const radiusMultiplier = w < 480 ? 0.60 : (w < 768 ? 0.80 : 1.0);
+
+    // Apply scale dynamically to the core glow components
+    this.core.scale.setScalar(scaleFactor);
+    this.glow.scale.setScalar(scaleFactor);
+
     this.nodes.forEach((group, i) => {
       const { angle, radius, y, speed } = group.userData;
+      const currentRadius = radius * radiusMultiplier;
+      const currentY = y * radiusMultiplier;
+
       const a = angle + t * speed;
-      const x = Math.cos(a) * radius;
-      const z = Math.sin(a) * radius;
-      const py = y + Math.sin(t + i) * 0.15;
+      const x = Math.cos(a) * currentRadius;
+      const z = Math.sin(a) * currentRadius;
+      const py = currentY + Math.sin(t + i) * 0.15 * scaleFactor;
       group.position.set(x, py, z);
       group.lookAt(0, py, 0);
+
+      // Adjust scales and offsets of children (dot & text label) responsively
+      const dot = group.children[0];
+      const sprite = group.children[1];
+
+      if (dot) {
+        dot.scale.setScalar(scaleFactor);
+      }
+      if (sprite) {
+        sprite.scale.set(1.8 * scaleFactor, 0.45 * scaleFactor, 1);
+        sprite.position.set(0, 0.28 * scaleFactor, 0);
+      }
+
       this.nodePositions.push({ x, y: py, z });
 
       const nextNode = this.nodes[(i + 1) % this.nodes.length];
       const nd = nextNode.userData;
+      const nextRadius = nd.radius * radiusMultiplier;
+      const nextY = nd.y * radiusMultiplier;
+
       const na = nd.angle + t * nd.speed;
-      const nx = Math.cos(na) * nd.radius;
-      const ny = nd.y + Math.sin(t + i + 1) * 0.15;
-      const nz = Math.sin(na) * nd.radius;
+      const nx = Math.cos(na) * nextRadius;
+      const ny = nextY + Math.sin(t + i + 1) * 0.15 * scaleFactor;
+      const nz = Math.sin(na) * nextRadius;
 
       linePos[offset++] = x;
       linePos[offset++] = py;
@@ -168,6 +273,16 @@ export class SkillsOrbit {
   }
 
   dispose() {
+    const dragTarget = this.canvas.parentElement;
+    if (dragTarget) {
+      dragTarget.removeEventListener('mousedown', this._onPointerDown);
+      dragTarget.removeEventListener('mousemove', this._onPointerMove);
+      dragTarget.removeEventListener('touchstart', this._onPointerDown);
+      dragTarget.removeEventListener('touchmove', this._onPointerMove);
+    }
+    window.removeEventListener('mouseup', this._onPointerUp);
+    window.removeEventListener('touchend', this._onPointerUp);
+    window.removeEventListener('resize', this._resizeHandler);
     this.renderer.dispose();
   }
 }

@@ -60,27 +60,30 @@ function initThree() {
   }
 
   const skillsCanvas = document.getElementById('skills-canvas');
-  if (skillsCanvas && !isMobile) {
-    skillsOrbit = new SkillsOrbit(skillsCanvas);
+  if (skillsCanvas) {
+    try {
+      skillsOrbit = new SkillsOrbit(skillsCanvas);
 
-    ScrollTrigger.create({
-      trigger: '#skills',
-      start: 'top bottom',
-      end: 'bottom top',
-      onEnter: () => skillsOrbit?.setActive(true),
-      onLeave: () => skillsOrbit?.setActive(false),
-      onEnterBack: () => skillsOrbit?.setActive(true),
-      onLeaveBack: () => skillsOrbit?.setActive(false),
-    });
-  } else if (skillsCanvas) {
-    const wrap = document.getElementById('skills-canvas-wrap');
-    if (wrap) {
-      wrap.innerHTML = [
-        '<div class="skills-fallback">',
-        '<div class="skills-fallback__core"></div>',
-        '<p class="skills-fallback__text">Neural orbit · optimized view</p>',
-        '</div>',
-      ].join('');
+      ScrollTrigger.create({
+        trigger: '#skills',
+        start: 'top bottom',
+        end: 'bottom top',
+        onEnter: () => skillsOrbit?.setActive(true),
+        onLeave: () => skillsOrbit?.setActive(false),
+        onEnterBack: () => skillsOrbit?.setActive(true),
+        onLeaveBack: () => skillsOrbit?.setActive(false),
+      });
+    } catch (err) {
+      console.warn('SkillsOrbit WebGL initialization failed, using 2D fallback:', err);
+      const wrap = document.getElementById('skills-canvas-wrap');
+      if (wrap) {
+        wrap.innerHTML = [
+          '<div class="skills-fallback">',
+          '<div class="skills-fallback__core"></div>',
+          '<p class="skills-fallback__text">Neural orbit · optimized view</p>',
+          '</div>',
+        ].join('');
+      }
     }
   }
 }
