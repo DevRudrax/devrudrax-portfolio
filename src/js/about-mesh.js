@@ -9,6 +9,7 @@ export class AboutMesh {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
     this.camera.position.z = 4;
+    this.isActive = true;
 
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.setSize(this.width, this.height);
@@ -51,7 +52,12 @@ export class AboutMesh {
     this.renderer.setSize(this.width, this.height);
   }
 
+  setActive(active) {
+    this.isActive = active;
+  }
+
   render() {
+    if (!this.isActive) return;
     const t = this.clock.getElapsedTime();
     this.mesh.rotation.x = t * 0.25;
     this.mesh.rotation.y = t * 0.4;

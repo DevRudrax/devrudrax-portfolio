@@ -497,6 +497,8 @@ body.is-mobile button {
   font-size: clamp(2.5rem, 10vw, 6.5rem);
   letter-spacing: 0.04em;
   overflow: hidden;
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
 }
 
 .hero__title .line--accent .char {
@@ -556,18 +558,20 @@ body.is-mobile button {
   transition: box-shadow 0.4s, transform 0.4s var(--ease-out-expo), border-color 0.4s;
 }
 
-.btn--glow:hover {
-  border-color: var(--violet);
-  box-shadow: var(--glow-violet), 0 0 60px rgba(0, 212, 255, 0.2);
-  transform: translateY(-2px);
-}
-
 .btn__arrow {
   transition: transform 0.3s var(--ease-out-expo);
 }
 
-.btn--glow:hover .btn__arrow {
-  transform: translateX(4px);
+@media (hover: hover) {
+  .btn--glow:hover {
+    border-color: var(--violet);
+    box-shadow: var(--glow-violet), 0 0 60px rgba(0, 212, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .btn--glow:hover .btn__arrow {
+    transform: translateX(4px);
+  }
 }
 
 .hero__scroll-hint {
@@ -701,8 +705,10 @@ body.is-mobile button {
   pointer-events: none;
 }
 
-.project-card:hover .project-card__glow {
-  opacity: 1;
+@media (hover: hover) {
+  .project-card:hover .project-card__glow {
+    opacity: 1;
+  }
 }
 
 .project-card__index {
@@ -751,8 +757,10 @@ body.is-mobile button {
   transition: text-shadow 0.3s;
 }
 
-.project-card__link:hover {
-  text-shadow: 0 0 20px var(--cyan);
+@media (hover: hover) {
+  .project-card__link:hover {
+    text-shadow: 0 0 20px var(--cyan);
+  }
 }
 
 .project-card__link--disabled {
@@ -900,10 +908,12 @@ body.is-mobile button {
   color: var(--cyan);
 }
 
-.contact-icon:hover {
-  border-color: var(--violet);
-  box-shadow: var(--glow-violet);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .contact-icon:hover {
+    border-color: var(--violet);
+    box-shadow: var(--glow-violet);
+    transform: translateY(-2px);
+  }
 }
 
 .contact-form {

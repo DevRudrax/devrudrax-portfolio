@@ -11,19 +11,19 @@ export function initFooterParticles(canvas) {
     canvas.height = parent.offsetHeight;
   }
 
+  resize();
+  window.addEventListener('resize', resize);
+
   for (let i = 0; i < count; i++) {
     particles.push({
-      x: Math.random() * 800,
-      y: Math.random() * 120,
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 0.3,
       vy: (Math.random() - 0.5) * 0.2,
       r: 1 + Math.random() * 2,
       a: 0.2 + Math.random() * 0.5,
     });
   }
-
-  resize();
-  window.addEventListener('resize', resize);
 
   let raf;
   function draw() {

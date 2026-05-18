@@ -35,9 +35,12 @@ export class NeuralScene {
     this._buildParticles();
     this._buildOrbs();
     this._buildLines();
+    this._resizeHandler = () => this._onResize();
+    this._mouseMoveHandler = (e) => this._onMouseMove(e);
+
     this._onResize();
-    window.addEventListener('resize', () => this._onResize());
-    window.addEventListener('mousemove', (e) => this._onMouseMove(e));
+    window.addEventListener('resize', this._resizeHandler);
+    window.addEventListener('mousemove', this._mouseMoveHandler);
   }
 
   _particleCount() {
@@ -221,7 +224,8 @@ export class NeuralScene {
   }
 
   dispose() {
-    window.removeEventListener('resize', () => this._onResize());
+    window.removeEventListener('resize', this._resizeHandler);
+    window.removeEventListener('mousemove', this._mouseMoveHandler);
     this.renderer.dispose();
     this.particleMaterial.dispose();
     this.particles.geometry.dispose();

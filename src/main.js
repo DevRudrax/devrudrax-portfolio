@@ -47,6 +47,16 @@ function initThree() {
   const aboutContainer = document.getElementById('about-object');
   if (aboutContainer && !isMobile) {
     aboutMesh = new AboutMesh(aboutContainer);
+
+    ScrollTrigger.create({
+      trigger: '#about',
+      start: 'top bottom',
+      end: 'bottom top',
+      onEnter: () => aboutMesh?.setActive(true),
+      onLeave: () => aboutMesh?.setActive(false),
+      onEnterBack: () => aboutMesh?.setActive(true),
+      onLeaveBack: () => aboutMesh?.setActive(false),
+    });
   }
 
   const skillsCanvas = document.getElementById('skills-canvas');
