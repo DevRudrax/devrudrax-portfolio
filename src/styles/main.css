@@ -749,17 +749,32 @@ body.is-mobile button {
   letter-spacing: 0.05em;
 }
 
+.project-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: auto;
+}
+
 .project-card__link {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--cyan);
   letter-spacing: 0.08em;
-  transition: text-shadow 0.3s;
+  transition: text-shadow 0.3s, color 0.3s;
+}
+
+.project-card__link--demo {
+  color: var(--violet);
 }
 
 @media (hover: hover) {
   .project-card__link:hover {
     text-shadow: 0 0 20px var(--cyan);
+  }
+  .project-card__link--demo:hover {
+    text-shadow: 0 0 20px var(--violet);
   }
 }
 
