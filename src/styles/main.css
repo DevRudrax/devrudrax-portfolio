@@ -1141,7 +1141,7 @@ body.is-mobile button {
   }
 
   .skills-orbit-wrap {
-    width: min(340px, 86vw);
+    width: min(460px, 94vw);
     aspect-ratio: 1 / 1;
     margin: 1.5rem auto 2rem;
   }

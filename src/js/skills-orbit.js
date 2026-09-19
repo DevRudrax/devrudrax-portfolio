@@ -140,37 +140,37 @@ export class SkillsOrbit {
   _createLabelSprite(text) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = 256;
-    canvas.height = 64;
+    canvas.width = 512;
+    canvas.height = 128;
 
-    ctx.clearRect(0, 0, 256, 64);
+    ctx.clearRect(0, 0, 512, 128);
 
-    const r = 12;
-    ctx.fillStyle = 'rgba(10, 14, 26, 0.65)';
-    ctx.strokeStyle = 'rgba(0, 212, 255, 0.45)';
-    ctx.lineWidth = 2;
+    const r = 24;
+    ctx.fillStyle = 'rgba(10, 14, 28, 0.75)';
+    ctx.strokeStyle = 'rgba(0, 212, 255, 0.6)';
+    ctx.lineWidth = 4;
 
     ctx.beginPath();
-    ctx.moveTo(r, 4);
-    ctx.lineTo(256 - r, 4);
-    ctx.quadraticCurveTo(256 - 4, 4, 256 - 4, r);
-    ctx.lineTo(256 - 4, 64 - r);
-    ctx.quadraticCurveTo(256 - 4, 64 - 4, 256 - r, 64 - 4);
-    ctx.lineTo(r, 64 - 4);
-    ctx.quadraticCurveTo(4, 64 - 4, 4, 64 - r);
-    ctx.lineTo(4, r);
-    ctx.quadraticCurveTo(4, 4, r, 4);
+    ctx.moveTo(r, 8);
+    ctx.lineTo(512 - r, 8);
+    ctx.quadraticCurveTo(512 - 8, 8, 512 - 8, r);
+    ctx.lineTo(512 - 8, 128 - r);
+    ctx.quadraticCurveTo(512 - 8, 128 - 8, 512 - r, 128 - 8);
+    ctx.lineTo(r, 128 - 8);
+    ctx.quadraticCurveTo(8, 128 - 8, 8, 128 - r);
+    ctx.lineTo(8, r);
+    ctx.quadraticCurveTo(8, 8, r, 8);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '600 20px Orbitron, sans-serif';
+    ctx.font = '700 42px Orbitron, sans-serif';
     ctx.fillStyle = '#00d4ff';
-    ctx.shadowColor = 'rgba(0, 212, 255, 0.6)';
-    ctx.shadowBlur = 6;
+    ctx.shadowColor = 'rgba(0, 212, 255, 0.8)';
+    ctx.shadowBlur = 12;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, 128, 32);
+    ctx.fillText(text, 256, 64);
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.minFilter = THREE.LinearFilter;
@@ -191,7 +191,7 @@ export class SkillsOrbit {
     const mat = new THREE.LineBasicMaterial({
       color: 0x00d4ff,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.22,
     });
     this.connectionLines = new THREE.LineSegments(geo, mat);
     this.orbitGroup.add(this.connectionLines);
@@ -201,16 +201,16 @@ export class SkillsOrbit {
   _resize() {
     const parent = this.canvas.parentElement;
     const w = (parent && parent.clientWidth > 0) ? parent.clientWidth : window.innerWidth;
-    const h = (parent && parent.clientHeight > 0) ? parent.clientHeight : w;
+    const h = w;
 
-    this.camera.aspect = w / h;
+    this.camera.aspect = 1;
 
     if (w < 480) {
-      this.camera.position.z = 10.5;
+      this.camera.position.z = 7.8;
     } else if (w < 768) {
-      this.camera.position.z = 10.0;
+      this.camera.position.z = 8.2;
     } else {
-      this.camera.position.z = 9.5;
+      this.camera.position.z = 8.5;
     }
 
     this.camera.updateProjectionMatrix();
@@ -240,8 +240,8 @@ export class SkillsOrbit {
     this.nodePositions = [];
 
     const w = window.innerWidth;
-    const scaleFactor = w < 480 ? 0.65 : (w < 768 ? 0.82 : 1.0);
-    const radiusMultiplier = w < 480 ? 0.65 : (w < 768 ? 0.82 : 1.0);
+    const scaleFactor = w < 480 ? 0.85 : (w < 768 ? 0.92 : 1.0);
+    const radiusMultiplier = w < 480 ? 0.78 : (w < 768 ? 0.88 : 1.0);
 
     this.core.scale.setScalar(scaleFactor);
     this.glow.scale.setScalar(scaleFactor);
@@ -265,7 +265,7 @@ export class SkillsOrbit {
         dot.scale.setScalar(scaleFactor);
       }
       if (sprite) {
-        sprite.scale.set(1.4 * scaleFactor, 0.35 * scaleFactor, 1);
+        sprite.scale.set(1.9 * scaleFactor, 0.475 * scaleFactor, 1);
       }
 
       this.nodePositions.push({ x, y: py, z });
