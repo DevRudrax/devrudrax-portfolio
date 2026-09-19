@@ -227,24 +227,28 @@ export function initContactForm() {
   });
 }
 
-export function initProjectsTrack({ isMobile = false } = {}) {
+export function initProjectsTrack() {
   const section = document.getElementById('projects');
   const track = document.getElementById('projects-track');
   const progressBar = document.getElementById('projects-progress-bar');
 
   if (!section || !track) return;
 
+  const isMobile = window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+
   if (isMobile) {
-    track.style.overflowX = 'auto';
-    const updateProgress = () => {
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      if (progressBar && maxScroll > 0) {
-        const pct = (track.scrollLeft / maxScroll) * 100;
-        progressBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
-      }
-    };
-    track.addEventListener('scroll', updateProgress, { passive: true });
-    updateProgress();
+    const trackWrap = track.parentElement;
+    if (trackWrap) {
+      const updateProgress = () => {
+        const maxScroll = trackWrap.scrollWidth - trackWrap.clientWidth;
+        if (progressBar && maxScroll > 0) {
+          const pct = (trackWrap.scrollLeft / maxScroll) * 100;
+          progressBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+        }
+      };
+      trackWrap.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
     return;
   }
 

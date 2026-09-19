@@ -132,6 +132,9 @@ export class SkillsOrbit {
 
   setActive(active) {
     this.isActive = active;
+    if (active) {
+      this._resize();
+    }
   }
 
   _createLabelSprite(text) {
@@ -143,8 +146,8 @@ export class SkillsOrbit {
     ctx.clearRect(0, 0, 256, 64);
 
     const r = 12;
-    ctx.fillStyle = 'rgba(12, 16, 28, 0.55)';
-    ctx.strokeStyle = 'rgba(0, 212, 255, 0.4)';
+    ctx.fillStyle = 'rgba(10, 14, 26, 0.65)';
+    ctx.strokeStyle = 'rgba(0, 212, 255, 0.45)';
     ctx.lineWidth = 2;
 
     ctx.beginPath();
@@ -197,26 +200,30 @@ export class SkillsOrbit {
 
   _resize() {
     const parent = this.canvas.parentElement;
-    if (!parent) return;
-    const w = parent.clientWidth;
-    const h = parent.clientHeight;
-    if (w === 0 || h === 0) return;
+    const w = (parent && parent.clientWidth > 0) ? parent.clientWidth : window.innerWidth;
+    const h = (parent && parent.clientHeight > 0) ? parent.clientHeight : w;
 
     this.camera.aspect = w / h;
 
     if (w < 480) {
-      this.camera.position.z = 12.0;
-    } else if (w < 768) {
       this.camera.position.z = 10.5;
+    } else if (w < 768) {
+      this.camera.position.z = 10.0;
     } else {
       this.camera.position.z = 9.5;
     }
 
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(w, h, false);
+    this.renderer.setSize(w, h, true);
   }
 
   render() {
+    if (!this.isActive) return;
+
+    if (this.canvas.clientWidth === 0 || this.canvas.clientHeight === 0) {
+      this._resize();
+    }
+
     const t = this.clock.getElapsedTime();
     this.core.rotation.y = t * 0.2;
     this.glow.rotation.x = t * 0.15;
@@ -233,7 +240,8 @@ export class SkillsOrbit {
     this.nodePositions = [];
 
     const w = window.innerWidth;
-    const scaleFactor = w < 480 ? 0.75 : (w < 768 ? 0.88 : 1.0);
+    const scaleFactor = w < 480 ? 0.65 : (w < 768 ? 0.82 : 1.0);
+    const radiusMultiplier = w < 480 ? 0.65 : (w < 768 ? 0.82 : 1.0);
 
     this.core.scale.setScalar(scaleFactor);
     this.glow.scale.setScalar(scaleFactor);
@@ -241,10 +249,13 @@ export class SkillsOrbit {
     this.nodes.forEach((group, i) => {
       const { angle, radius, y, speed } = group.userData;
 
+      const currentRadius = radius * radiusMultiplier;
+      const currentY = y * radiusMultiplier;
+
       const a = angle + t * speed;
-      const x = Math.cos(a) * radius;
-      const z = Math.sin(a) * radius;
-      const py = y + Math.sin(t * 1.5 + i) * 0.2;
+      const x = Math.cos(a) * currentRadius;
+      const z = Math.sin(a) * currentRadius;
+      const py = currentY + Math.sin(t * 1.5 + i) * 0.2 * scaleFactor;
       group.position.set(x, py, z);
 
       const dot = group.children[0];
@@ -262,10 +273,13 @@ export class SkillsOrbit {
       const nextNode = this.nodes[(i + 1) % this.nodes.length];
       const nd = nextNode.userData;
 
+      const nextRadius = nd.radius * radiusMultiplier;
+      const nextY = nd.y * radiusMultiplier;
+
       const na = nd.angle + t * nd.speed;
-      const nx = Math.cos(na) * nd.radius;
-      const ny = nd.y + Math.sin(t * 1.5 + i + 1) * 0.2;
-      const nz = Math.sin(na) * nd.radius;
+      const nx = Math.cos(na) * nextRadius;
+      const ny = nextY + Math.sin(t * 1.5 + i + 1) * 0.2 * scaleFactor;
+      const nz = Math.sin(na) * nextRadius;
 
       linePos[offset++] = x;
       linePos[offset++] = py;
