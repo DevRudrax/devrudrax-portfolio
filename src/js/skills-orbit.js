@@ -140,44 +140,45 @@ export class SkillsOrbit {
   _createLabelSprite(text) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = 512;
-    canvas.height = 128;
+    canvas.width = 384;
+    canvas.height = 96;
 
-    ctx.clearRect(0, 0, 512, 128);
+    ctx.clearRect(0, 0, 384, 96);
 
-    const r = 24;
-    ctx.fillStyle = 'rgba(10, 14, 28, 0.75)';
-    ctx.strokeStyle = 'rgba(0, 212, 255, 0.6)';
-    ctx.lineWidth = 4;
+    const r = 16;
+    ctx.fillStyle = 'rgba(10, 14, 26, 0.70)';
+    ctx.strokeStyle = 'rgba(0, 212, 255, 0.5)';
+    ctx.lineWidth = 3;
 
     ctx.beginPath();
-    ctx.moveTo(r, 8);
-    ctx.lineTo(512 - r, 8);
-    ctx.quadraticCurveTo(512 - 8, 8, 512 - 8, r);
-    ctx.lineTo(512 - 8, 128 - r);
-    ctx.quadraticCurveTo(512 - 8, 128 - 8, 512 - r, 128 - 8);
-    ctx.lineTo(r, 128 - 8);
-    ctx.quadraticCurveTo(8, 128 - 8, 8, 128 - r);
-    ctx.lineTo(8, r);
-    ctx.quadraticCurveTo(8, 8, r, 8);
+    ctx.moveTo(r, 6);
+    ctx.lineTo(384 - r, 6);
+    ctx.quadraticCurveTo(384 - 6, 6, 384 - 6, r);
+    ctx.lineTo(384 - 6, 96 - r);
+    ctx.quadraticCurveTo(384 - 6, 96 - 6, 384 - r, 96 - 6);
+    ctx.lineTo(r, 96 - 6);
+    ctx.quadraticCurveTo(6, 96 - 6, 6, 96 - r);
+    ctx.lineTo(6, r);
+    ctx.quadraticCurveTo(6, 6, r, 6);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '700 42px Orbitron, sans-serif';
+    ctx.font = '700 30px Orbitron, sans-serif';
     ctx.fillStyle = '#00d4ff';
-    ctx.shadowColor = 'rgba(0, 212, 255, 0.8)';
-    ctx.shadowBlur = 12;
+    ctx.shadowColor = 'rgba(0, 212, 255, 0.7)';
+    ctx.shadowBlur = 8;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, 256, 64);
+    ctx.fillText(text, 192, 48);
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.minFilter = THREE.LinearFilter;
     const material = new THREE.SpriteMaterial({
       map: texture,
       transparent: true,
-      depthTest: false,
+      depthTest: true,
+      depthWrite: false,
     });
     return new THREE.Sprite(material);
   }
@@ -206,11 +207,11 @@ export class SkillsOrbit {
     this.camera.aspect = 1;
 
     if (w < 480) {
-      this.camera.position.z = 7.8;
+      this.camera.position.z = 10.2;
     } else if (w < 768) {
-      this.camera.position.z = 8.2;
+      this.camera.position.z = 9.8;
     } else {
-      this.camera.position.z = 8.5;
+      this.camera.position.z = 9.5;
     }
 
     this.camera.updateProjectionMatrix();
@@ -240,8 +241,8 @@ export class SkillsOrbit {
     this.nodePositions = [];
 
     const w = window.innerWidth;
-    const scaleFactor = w < 480 ? 0.85 : (w < 768 ? 0.92 : 1.0);
-    const radiusMultiplier = w < 480 ? 0.78 : (w < 768 ? 0.88 : 1.0);
+    const scaleFactor = w < 480 ? 0.8 : (w < 768 ? 0.9 : 1.0);
+    const radiusMultiplier = w < 480 ? 0.75 : (w < 768 ? 0.85 : 1.0);
 
     this.core.scale.setScalar(scaleFactor);
     this.glow.scale.setScalar(scaleFactor);
@@ -255,7 +256,7 @@ export class SkillsOrbit {
       const a = angle + t * speed;
       const x = Math.cos(a) * currentRadius;
       const z = Math.sin(a) * currentRadius;
-      const py = currentY + Math.sin(t * 1.5 + i) * 0.2 * scaleFactor;
+      const py = currentY + Math.sin(t * 1.5 + i) * 0.18 * scaleFactor;
       group.position.set(x, py, z);
 
       const dot = group.children[0];
@@ -265,7 +266,7 @@ export class SkillsOrbit {
         dot.scale.setScalar(scaleFactor);
       }
       if (sprite) {
-        sprite.scale.set(1.9 * scaleFactor, 0.475 * scaleFactor, 1);
+        sprite.scale.set(1.1 * scaleFactor, 0.275 * scaleFactor, 1);
       }
 
       this.nodePositions.push({ x, y: py, z });
