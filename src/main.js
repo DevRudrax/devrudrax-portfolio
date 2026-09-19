@@ -102,7 +102,7 @@ function bootstrap() {
   splitHeroTitle();
   initCursor();
   initTiltCards();
-  initProjectsTrack();
+  initProjectsTrack({ isMobile });
   initHeroCTA((target) => scrollTo(target, lenis));
   initContactForm();
   initNav(lenis);

@@ -227,88 +227,50 @@ export function initContactForm() {
   });
 }
 
-export function initProjectsTrack() {
+export function initProjectsTrack({ isMobile = false } = {}) {
+  const section = document.getElementById('projects');
   const track = document.getElementById('projects-track');
-  const prevBtn = document.getElementById('projects-prev');
-  const nextBtn = document.getElementById('projects-next');
   const progressBar = document.getElementById('projects-progress-bar');
-  if (!track) return;
 
-  function updateProgress() {
-    const maxScroll = track.scrollWidth - track.clientWidth;
-    if (prevBtn) prevBtn.disabled = track.scrollLeft <= 5;
-    if (nextBtn) nextBtn.disabled = track.scrollLeft >= maxScroll - 5;
+  if (!section || !track) return;
 
-    if (progressBar) {
-      const pct = maxScroll > 0 ? (track.scrollLeft / maxScroll) * 100 : 0;
-      progressBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
-    }
-  }
-
-  updateProgress();
-  setTimeout(updateProgress, 300);
-  track.addEventListener('scroll', updateProgress, { passive: true });
-  window.addEventListener('resize', updateProgress, { passive: true });
-
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      const cardWidth = track.querySelector('.project-card')?.offsetWidth || 340;
-      track.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      const cardWidth = track.querySelector('.project-card')?.offsetWidth || 340;
-      track.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
-    });
-  }
-
-  track.addEventListener(
-    'wheel',
-    (e) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        const maxScroll = track.scrollWidth - track.clientWidth;
-        if (maxScroll <= 0) return;
-
-        const canScrollRight = e.deltaY > 0 && track.scrollLeft < maxScroll - 2;
-        const canScrollLeft = e.deltaY < 0 && track.scrollLeft > 2;
-
-        if (canScrollRight || canScrollLeft) {
-          e.preventDefault();
-          track.scrollLeft += e.deltaY * 1.2;
-        }
+  if (isMobile) {
+    track.style.overflowX = 'auto';
+    const updateProgress = () => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      if (progressBar && maxScroll > 0) {
+        const pct = (track.scrollLeft / maxScroll) * 100;
+        progressBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
       }
-    },
-    { passive: false }
-  );
+    };
+    track.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+    return;
+  }
 
-  let isDragging = false;
-  let startX = 0;
-  let scrollLeftStart = 0;
-
-  track.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    track.classList.add('is-dragging');
-    startX = e.pageX - track.offsetLeft;
-    scrollLeftStart = track.scrollLeft;
-  });
-
-  window.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const x = e.pageX - track.offsetLeft;
-    const walk = (x - startX) * 1.6;
-    track.scrollLeft = scrollLeftStart - walk;
-  });
-
-  const stopDrag = () => {
-    if (isDragging) {
-      isDragging = false;
-      track.classList.remove('is-dragging');
-    }
+  const getScrollDistance = () => {
+    const trackWidth = track.scrollWidth;
+    const viewportWidth = window.innerWidth;
+    return -(trackWidth - viewportWidth + 80);
   };
 
-  window.addEventListener('mouseup', stopDrag);
-  track.addEventListener('mouseleave', stopDrag);
+  gsap.to(track, {
+    x: getScrollDistance,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: section,
+      pin: true,
+      scrub: 0.6,
+      start: 'top top',
+      end: () => `+=${Math.abs(getScrollDistance()) + 300}`,
+      invalidateOnRefresh: true,
+      anticipatePin: 1,
+      onUpdate: (self) => {
+        if (progressBar) {
+          progressBar.style.width = `${Math.min(100, Math.max(0, self.progress * 100))}%`;
+        }
+      },
+    },
+  });
 }
 

@@ -647,93 +647,51 @@ body.is-mobile button {
 
 /* Projects */
 .section--projects {
-  min-height: auto;
-  padding-top: calc(var(--section-pad) + 2rem);
-  padding-bottom: calc(var(--section-pad) + 2rem);
+  position: relative;
+  overflow: hidden;
+  padding-top: clamp(4rem, 8vh, 6rem);
+  padding-bottom: clamp(4rem, 8vh, 6rem);
 }
 
 .projects-pin {
   width: 100%;
-  max-width: 100%;
-}
-
-.section__header--flex {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 1.5rem;
-}
-
-.projects-nav {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.projects-nav__btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(0, 212, 255, 0.08);
-  border: 1px solid rgba(0, 212, 255, 0.3);
-  color: var(--cyan);
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
 }
 
-@media (hover: hover) {
-  .projects-nav__btn:hover:not(:disabled) {
-    background: rgba(0, 212, 255, 0.2);
-    border-color: var(--cyan);
-    box-shadow: var(--glow-cyan);
-    transform: scale(1.08);
-  }
+.section__header {
+  max-width: 1200px;
+  margin: 0 auto 2.5rem;
+  width: 100%;
+  padding: 0 clamp(1.25rem, 5vw, 4rem);
 }
 
-.projects-nav__btn:disabled {
-  opacity: 0.25;
-  cursor: not-allowed;
-  box-shadow: none;
-  border-color: rgba(255, 255, 255, 0.1);
+.section__header--center {
+  text-align: center;
+}
+
+.section__header--center .section__text {
+  margin: 0 auto;
+}
+
+.projects-track-wrap {
+  width: 100%;
+  overflow: hidden;
 }
 
 .projects-track {
   display: flex;
   flex-wrap: nowrap;
-  gap: 1.5rem;
+  gap: 1.75rem;
   padding: 1rem clamp(1.25rem, 5vw, 4rem) 2rem;
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  cursor: grab;
-  user-select: none;
-  scroll-behavior: smooth;
-}
-
-.projects-track:active,
-.projects-track.is-dragging {
-  cursor: grabbing;
-  scroll-behavior: auto;
-  scroll-snap-type: none;
-}
-
-.projects-track a {
-  user-drag: none;
-  -webkit-user-drag: none;
-}
-
-.projects-track::-webkit-scrollbar {
-  display: none;
+  width: max-content;
+  will-change: transform;
 }
 
 .projects-progress {
   max-width: 1200px;
-  margin: 1rem auto 0;
+  margin: 2rem auto 0;
   height: 3px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 3px;
@@ -747,12 +705,12 @@ body.is-mobile button {
   width: 0%;
   background: linear-gradient(90deg, var(--cyan), var(--violet));
   box-shadow: var(--glow-cyan);
-  transition: width 0.15s ease-out;
+  transition: width 0.1s linear;
   border-radius: 3px;
 }
 
 .project-card {
-  flex: 0 0 min(340px, 85vw);
+  flex: 0 0 min(360px, 80vw);
   scroll-snap-align: center;
   padding: 2rem;
   position: relative;
