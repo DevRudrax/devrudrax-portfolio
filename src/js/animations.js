@@ -226,3 +226,89 @@ export function initContactForm() {
     }, 3000);
   });
 }
+
+export function initProjectsTrack() {
+  const track = document.getElementById('projects-track');
+  const prevBtn = document.getElementById('projects-prev');
+  const nextBtn = document.getElementById('projects-next');
+  const progressBar = document.getElementById('projects-progress-bar');
+  if (!track) return;
+
+  function updateProgress() {
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    if (prevBtn) prevBtn.disabled = track.scrollLeft <= 5;
+    if (nextBtn) nextBtn.disabled = track.scrollLeft >= maxScroll - 5;
+
+    if (progressBar) {
+      const pct = maxScroll > 0 ? (track.scrollLeft / maxScroll) * 100 : 0;
+      progressBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+    }
+  }
+
+  updateProgress();
+  setTimeout(updateProgress, 300);
+  track.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress, { passive: true });
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      const cardWidth = track.querySelector('.project-card')?.offsetWidth || 340;
+      track.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const cardWidth = track.querySelector('.project-card')?.offsetWidth || 340;
+      track.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
+    });
+  }
+
+  track.addEventListener(
+    'wheel',
+    (e) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        if (maxScroll <= 0) return;
+
+        const canScrollRight = e.deltaY > 0 && track.scrollLeft < maxScroll - 2;
+        const canScrollLeft = e.deltaY < 0 && track.scrollLeft > 2;
+
+        if (canScrollRight || canScrollLeft) {
+          e.preventDefault();
+          track.scrollLeft += e.deltaY * 1.2;
+        }
+      }
+    },
+    { passive: false }
+  );
+
+  let isDragging = false;
+  let startX = 0;
+  let scrollLeftStart = 0;
+
+  track.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    track.classList.add('is-dragging');
+    startX = e.pageX - track.offsetLeft;
+    scrollLeftStart = track.scrollLeft;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const x = e.pageX - track.offsetLeft;
+    const walk = (x - startX) * 1.6;
+    track.scrollLeft = scrollLeftStart - walk;
+  });
+
+  const stopDrag = () => {
+    if (isDragging) {
+      isDragging = false;
+      track.classList.remove('is-dragging');
+    }
+  };
+
+  window.addEventListener('mouseup', stopDrag);
+  track.addEventListener('mouseleave', stopDrag);
+}
+

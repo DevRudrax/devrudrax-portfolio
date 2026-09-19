@@ -15,6 +15,7 @@ import {
   initScrollAnimations,
   initHeroCTA,
   initContactForm,
+  initProjectsTrack,
   initNav,
 } from './js/animations.js';
 
@@ -101,6 +102,7 @@ function bootstrap() {
   splitHeroTitle();
   initCursor();
   initTiltCards();
+  initProjectsTrack();
   initHeroCTA((target) => scrollTo(target, lenis));
   initContactForm();
   initNav(lenis);

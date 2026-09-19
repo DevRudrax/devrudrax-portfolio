@@ -109,12 +109,22 @@
 
       <section id="projects" class="section section--projects" data-section="2">
         <div class="projects-pin">
-        <div class="section__header">
-          <span class="section__tag">02 — Projects</span>
-          <h2 class="section__title glitch-text" data-text="Selected Work">Selected Work</h2>
-          <p class="section__text section__text--muted">
-            Open-source experiments and products from the DevRudrax universe.
-          </p>
+        <div class="section__header section__header--flex">
+          <div>
+            <span class="section__tag">02 — Projects</span>
+            <h2 class="section__title glitch-text" data-text="Selected Work">Selected Work</h2>
+            <p class="section__text section__text--muted">
+              Open-source experiments and products from the DevRudrax universe.
+            </p>
+          </div>
+          <div class="projects-nav">
+            <button class="projects-nav__btn magnetic" id="projects-prev" aria-label="Previous project" data-cursor="hover">
+              ←
+            </button>
+            <button class="projects-nav__btn magnetic" id="projects-next" aria-label="Next project" data-cursor="hover">
+              →
+            </button>
+          </div>
         </div>
         <div class="projects-track" id="projects-track" data-lenis-prevent>
           <article class="project-card glass tilt" data-tilt>
@@ -275,6 +285,9 @@
             <div class="project-card__pulse" aria-hidden="true"></div>
             <span class="project-card__link project-card__link--disabled">In Development…</span>
           </article>
+        </div>
+        <div class="projects-progress">
+          <div class="projects-progress__bar" id="projects-progress-bar"></div>
         </div>
         </div>
       </section>
