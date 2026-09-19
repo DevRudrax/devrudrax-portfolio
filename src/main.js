@@ -65,15 +65,16 @@ function initThree() {
     try {
       skillsOrbit = new SkillsOrbit(skillsCanvas);
 
-      ScrollTrigger.create({
-        trigger: '#skills',
-        start: 'top bottom',
-        end: 'bottom top',
-        onEnter: () => skillsOrbit?.setActive(true),
-        onLeave: () => skillsOrbit?.setActive(false),
-        onEnterBack: () => skillsOrbit?.setActive(true),
-        onLeaveBack: () => skillsOrbit?.setActive(false),
-      });
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            skillsOrbit?.setActive(entry.isIntersecting);
+          });
+        },
+        { threshold: 0.02 }
+      );
+      const skillsSec = document.getElementById('skills');
+      if (skillsSec) observer.observe(skillsSec);
     } catch (err) {
       console.warn('SkillsOrbit WebGL initialization failed, using 2D fallback:', err);
       const wrap = document.getElementById('skills-canvas-wrap');
